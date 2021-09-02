@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { withStyles, Theme, createStyles, makeStyles } from "@material-ui/core/styles";
+import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -14,7 +14,7 @@ import {
   setCurrencyTableAmount,
   Status,
 } from "../../features/currencies/currenciesSlice";
-import { Box, CircularProgress, TextField } from "@material-ui/core";
+import { Box, CircularProgress } from "@material-ui/core";
 import Flag from "../atoms/Flag";
 import ExchangeCardMenu from "./Menu";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
@@ -70,7 +70,6 @@ export const CurrencyTable = () => {
   const handleClose = () => {
     setAnchorElement(null);
   };
-  console.log(baseCurrency);
 
   return status === Status.LOADING ? (
     <CircularProgress size={40} />

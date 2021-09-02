@@ -1,7 +1,6 @@
 import MenuItem from "@material-ui/core/MenuItem";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Menu from "@material-ui/core/Menu";
-import React, { useCallback } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Flag from "../atoms/Flag";
 import Typography from "@material-ui/core/Typography";

@@ -14,7 +14,6 @@ import {
   setCurrencies,
   setFirstCurrency,
   setSecondCurrency,
-  Status,
 } from "../../features/currencies/currenciesSlice";
 import { Box, Typography } from "@material-ui/core";
 
@@ -38,9 +37,7 @@ const useStyles = makeStyles(() => ({
 
 const CurrencyConvertCard = () => {
   const classes = useStyles();
-  const { firstCurrency, status, secondCurrency, currencies } = useAppSelector(
-    state => state.currencies
-  );
+  const { firstCurrency, secondCurrency, currencies } = useAppSelector(state => state.currencies);
 
   const dispatch = useAppDispatch();
 
