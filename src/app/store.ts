@@ -1,7 +1,10 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
+import currenciesReducer from "../features/currencies/currenciesSlice";
 
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    currencies: currenciesReducer,
+  },
 });
 
 export type AppDispatch = typeof store.dispatch;
