@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
 import dotenv from "dotenv";
 import ExchangeCard from "./components/organisms/ExchangeCard";
+import { Layout } from "./components/Layout";
 
 dotenv.config();
 
@@ -10,10 +11,10 @@ function App() {
     <Router>
       <div>
         <Switch>
-          <Route path="/">
+          <Route exact path="/">
             <Home />
           </Route>
-          <Route path="/exchange-rates">
+          <Route exact path="/exchange-rates">
             <Users />
           </Route>
         </Switch>
@@ -25,7 +26,11 @@ function App() {
 export default App;
 
 function Home() {
-  return <ExchangeCard />;
+  return (
+    <Layout>
+      <ExchangeCard />
+    </Layout>
+  );
 }
 
 function About() {
@@ -33,5 +38,9 @@ function About() {
 }
 
 function Users() {
-  return <h2>Users</h2>;
+  return (
+    <Layout>
+      <ExchangeCard />
+    </Layout>
+  );
 }

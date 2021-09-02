@@ -5,6 +5,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Flag from "../atoms/Flag";
 import { countryCodes } from "../utils/utils";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles(() => ({
   currencyName: {
@@ -57,14 +58,15 @@ const ExchangeCardMenu: React.FC<ExchangeCardMenuProps> = ({
           classes={{
             root: classes.menuItem,
           }}
-          style={{}}
           key={code}
           onClick={() => onMenuItemClick(index)}>
           <Flag code={code} />
           {loading ? (
             <CircularProgress size={25} />
           ) : (
-            <h5 className={classes.currencyName}>{getCurrencyName(index)}</h5>
+            <Typography variant="body1" className={classes.currencyName}>
+              {getCurrencyName(index)}
+            </Typography>
           )}
         </MenuItem>
       ))}

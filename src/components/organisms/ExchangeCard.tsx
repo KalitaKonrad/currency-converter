@@ -4,7 +4,6 @@ import Paper from "@material-ui/core/Paper";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import InputLabel from "@material-ui/core/InputLabel";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import { capitalize } from "../utils/utils";
@@ -12,56 +11,30 @@ import Input from "../atoms/Input";
 import ExchangeCardMenu from "../molecules/Menu";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchCurrenciesData } from "../../features/currencies/currenciesSlice";
+import { Box, Typography } from "@material-ui/core";
+import { Layout } from "../Layout";
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: "flex",
-    flexWrap: "wrap",
-    "& > *": {
-      margin: "auto",
-      marginTop: theme.spacing(15),
-      width: theme.spacing(55),
-      height: theme.spacing(70),
-    },
-  },
-  title: {
-    marginTop: 35,
-    marginLeft: 45,
-    fontSize: 40,
-  },
+const useStyles = makeStyles(() => ({
   label: {
     fontSize: 20,
     marginBottom: 1,
-  },
-  list: {
-    width: "100%",
-    maxWidth: 390,
-    marginTop: theme.spacing(2),
-    marginLeft: theme.spacing(3),
-    backgroundColor: theme.palette.background.paper,
-  },
-  listItem: {
-    marginBottom: 5,
   },
   input: {
     backgroundColor: "#F5F5F5",
     marginBottom: 5,
   },
-  button: {
-    marginLeft: 15,
-  },
-  financial: {
-    fontSize: 21,
-  },
   financialCircularProgress: {
     marginLeft: "0.5rem",
+  },
+  exchangeRate: {
+    display: "flex",
+    justifyContent: "center",
   },
 }));
 
 const ExchangeCard = () => {
   const classes = useStyles();
   const currencies = useAppSelector(state => state.currencies.currencies);
-  const date = useAppSelector(state => state.currencies.date);
   const status = useAppSelector(state => state.currencies.status);
 
   const dispatch = useAppDispatch();
@@ -121,129 +94,117 @@ const ExchangeCard = () => {
     setReceiveCurrency(finalValue);
   };
 
-  const getCurrencyName = (index: number) => {
-    if (!currencies || currencies.length === 0) {
-      return "";
-    }
+  const getCurrencyName = (index: number) =>
+    currencies?.[index]?.currency ? capitalize(currencies?.[index]?.currency?.trim()) : "";
 
-    const endOfCurrencyName = currencies[index].currency.indexOf("(");
-
-    if (endOfCurrencyName === -1) {
-      return capitalize(currencies[index].currency);
-    }
-
-    return capitalize(currencies[index].currency.substring(0, endOfCurrencyName));
-  };
-
-  const getCurrencyCode = (index: number) => {
-    if (!currencies || currencies.length === 0) {
-      return "";
-    }
-
-    return currencies[index].code;
-  };
+  const getCurrencyCode = (index: number) => currencies[index].code;
 
   const calculateCurrencyFactor = () => {
-    if (!currencies || currencies.length === 0) {
-      return "";
-    }
-
-    return (currencies[sendIndex].mid / currencies[receiveIndex].mid).toFixed(2);
+    const exchangeRate = (currencies[sendIndex].mid / currencies[receiveIndex].mid).toFixed(2);
+    return `1 ${sendCurrencyCode} = ${exchangeRate} ${receiveCurrencyCode}`;
   };
 
-  const sendCurrencyCode = getCurrencyCode(sendIndex);
-  const receiveCurrencyCode = getCurrencyCode(receiveIndex);
+  const sendCurrencyCode = currencies?.length > 0 ? getCurrencyCode(sendIndex) : "";
+  const receiveCurrencyCode = currencies?.length > 0 ? getCurrencyCode(receiveIndex) : "";
 
   return (
-    <div className={classes.root}>
+    <Box display="flex" maxWidth={500} justifyContent="center" alignItems="center">
       <Paper elevation={3}>
-        <h1 className={classes.title}>Currency Converter</h1>
-        <List className={classes.list}>
-          <ListItem className={classes.listItem}>
-            <InputLabel className={classes.label}>From</InputLabel>
-          </ListItem>
-          <Button
-            className={classes.button}
-            aria-controls="simple-menu"
-            aria-haspopup="true"
-            startIcon={<AttachMoneyIcon />}
-            color="primary"
-            variant="outlined"
-            onClick={handleClick}>
-            Choose Currency
-          </Button>
-          <ExchangeCardMenu
-            anchorElement={anchorElement}
-            loading={status === "loading"}
-            onClose={handleClose}
-            open={!!anchorElement}
-            onMenuItemClick={(index: number) => {
-              setSendIndex(index);
-              handleClose();
-            }}
-            getCurrencyName={getCurrencyName}
-          />
-          <ListItem>
-            <Input
-              currencyValue={sendCurrency}
-              currencyCode={sendCurrencyCode}
+        <Box
+          display="flex"
+          p={3}
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center">
+          <Typography variant="h4" align="center">
+            Currency Converter
+          </Typography>
+          <List>
+            <ListItem>
+              <InputLabel className={classes.label}>From</InputLabel>
+            </ListItem>
+            <ListItem>
+              <Button
+                aria-controls="simple-menu"
+                aria-haspopup="true"
+                startIcon={<AttachMoneyIcon />}
+                color="primary"
+                variant="outlined"
+                onClick={handleClick}>
+                Choose Currency
+              </Button>
+            </ListItem>
+            <ExchangeCardMenu
+              anchorElement={anchorElement}
               loading={status === "loading"}
-              index={sendIndex}
-              onChange={e => calculateReceiveCurrency(e.target.value)}
+              onClose={handleClose}
+              open={!!anchorElement}
+              onMenuItemClick={(index: number) => {
+                setSendIndex(index);
+                handleClose();
+              }}
+              getCurrencyName={getCurrencyName}
             />
-          </ListItem>
-          <ListItem>
-            <InputLabel className={classes.label}>To</InputLabel>
-          </ListItem>
-          <Button
-            className={classes.button}
-            aria-controls="menu"
-            aria-haspopup="true"
-            startIcon={<AttachMoneyIcon />}
-            color="primary"
-            variant="outlined"
-            onClick={secondHandleClick}>
-            Choose Currency
-          </Button>
-          <ExchangeCardMenu
-            anchorElement={secondAnchorElement}
-            loading={status === "loading"}
-            onClose={secondHandleClose}
-            open={!!secondAnchorElement}
-            onMenuItemClick={(index: number) => {
-              setReceiveIndex(index);
-              secondHandleClose();
-            }}
-            getCurrencyName={getCurrencyName}
-          />
-          <ListItem>
-            <Input
-              currencyValue={receiveCurrency}
-              currencyCode={receiveCurrencyCode}
+            <ListItem>
+              <Input
+                currencyValue={sendCurrency}
+                currencyCode={sendCurrencyCode}
+                loading={status === "loading"}
+                index={sendIndex}
+                onChange={e => calculateReceiveCurrency(e.target.value)}
+              />
+            </ListItem>
+            <ListItem>
+              <InputLabel className={classes.label}>To</InputLabel>
+            </ListItem>
+            <ListItem>
+              <Button
+                aria-controls="menu"
+                aria-haspopup="true"
+                startIcon={<AttachMoneyIcon />}
+                color="primary"
+                variant="outlined"
+                onClick={secondHandleClick}>
+                Choose Currency
+              </Button>
+            </ListItem>
+            <ExchangeCardMenu
+              anchorElement={secondAnchorElement}
               loading={status === "loading"}
-              index={receiveIndex}
-              onChange={e => calculateSendCurrency(e.target.value)}
+              onClose={secondHandleClose}
+              open={!!secondAnchorElement}
+              onMenuItemClick={(index: number) => {
+                setReceiveIndex(index);
+                secondHandleClose();
+              }}
+              getCurrencyName={getCurrencyName}
             />
-          </ListItem>
-          <ListItem>
-            <div className={classes.financial}>
-              1 {sendCurrencyCode} =
-              {status === "loading" ? (
-                <CircularProgress size={20} className={classes.financialCircularProgress} />
-              ) : (
-                <b> {calculateCurrencyFactor()} </b>
-              )}
-              {receiveCurrencyCode}
-            </div>
-          </ListItem>
-          <ListItem>
-            <InputLabel>
-              <b>No transfer fee</b>
-            </InputLabel>
-          </ListItem>
-        </List>
+            <ListItem>
+              <Input
+                currencyValue={receiveCurrency}
+                currencyCode={receiveCurrencyCode}
+                loading={status === "loading"}
+                index={receiveIndex}
+                onChange={e => calculateSendCurrency(e.target.value)}
+              />
+            </ListItem>
+            {currencies && sendIndex && receiveIndex ? (
+              <ListItem classes={{ root: classes.exchangeRate }}>
+                <Box
+                  mt={2}
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  flexDirection="column">
+                  <Typography variant="h5">Current exchange rate</Typography>
+                  <Typography variant="subtitle1">{calculateCurrencyFactor()}</Typography>
+                </Box>
+              </ListItem>
+            ) : null}
+          </List>
+        </Box>
       </Paper>
-    </div>
+    </Box>
   );
 };
 

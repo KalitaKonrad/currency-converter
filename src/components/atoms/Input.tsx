@@ -5,12 +5,19 @@ import OutlinedInput, { OutlinedInputProps } from "@material-ui/core/OutlinedInp
 import { makeStyles } from "@material-ui/core/styles";
 import { countryCodes } from "../utils/utils";
 import Flag from "./Flag";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles(theme => ({
   input: {
     backgroundColor: "#F5F5F5",
     marginBottom: 5,
+    "& input::-webkit-clear-button, & input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+      {
+        display: "none",
+        margin: 0,
+      },
   },
+
   inputAdornmentStart: {
     marginRight: theme.spacing(1),
   },
@@ -37,6 +44,7 @@ const Input: React.FC<InputProps> = ({
     <OutlinedInput
       className={classes.input}
       type="number"
+      placeholder="0"
       startAdornment={
         <InputAdornment className={classes.inputAdornmentStart} position="start">
           <Flag code={countryCodes[index]} />
@@ -46,7 +54,7 @@ const Input: React.FC<InputProps> = ({
       value={currencyValue}
       endAdornment={
         <InputAdornment position="end">
-          {loading ? <CircularProgress size={25} /> : <b>{currencyCode}</b>}
+          <Typography variant="subtitle1">{currencyCode}</Typography>
         </InputAdornment>
       }
       onChange={onChange}
