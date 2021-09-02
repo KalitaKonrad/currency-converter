@@ -13,6 +13,7 @@ import {
   fetchCurrenciesData,
   setFirstCurrency,
   setSecondCurrency,
+  Status,
 } from "../../features/currencies/currenciesSlice";
 import { Box, Typography } from "@material-ui/core";
 
@@ -36,7 +37,9 @@ const useStyles = makeStyles(() => ({
 
 const CurrencyConvertCard = () => {
   const classes = useStyles();
-  const { firstCurrency, status, secondCurrency } = useAppSelector(state => state.currencies);
+  const { firstCurrency, status, secondCurrency, currencies } = useAppSelector(
+    state => state.currencies
+  );
 
   const dispatch = useAppDispatch();
 
@@ -46,7 +49,7 @@ const CurrencyConvertCard = () => {
   const [secondAnchorElement, setSecondAnchorElement] = useState<Element | null>(null);
 
   useEffect(() => {
-    if (status === "error" || status === "idle") {
+    if (currencies?.length === 0 || status === Status.ERROR) {
       dispatch(fetchCurrenciesData());
     }
   }, []);
@@ -133,7 +136,6 @@ const CurrencyConvertCard = () => {
             </ListItem>
             <ExchangeCardMenu
               anchorElement={anchorElement}
-              loading={status === "loading"}
               onClose={handleClose}
               open={!!anchorElement}
               onMenuItemClick={currency => {
@@ -144,7 +146,6 @@ const CurrencyConvertCard = () => {
             <ListItem>
               <Input
                 currencyValue={sendCurrency}
-                loading={status === "loading"}
                 code={firstCurrency?.code ?? ""}
                 onChange={e => calculateReceiveCurrency(e.target.value)}
               />
@@ -165,7 +166,6 @@ const CurrencyConvertCard = () => {
             </ListItem>
             <ExchangeCardMenu
               anchorElement={secondAnchorElement}
-              loading={status === "loading"}
               onClose={secondHandleClose}
               open={!!secondAnchorElement}
               onMenuItemClick={currency => {
@@ -176,7 +176,6 @@ const CurrencyConvertCard = () => {
             <ListItem>
               <Input
                 currencyValue={receiveCurrency}
-                loading={status === "loading"}
                 code={secondCurrency?.code ?? ""}
                 onChange={e => calculateSendCurrency(e.target.value)}
               />

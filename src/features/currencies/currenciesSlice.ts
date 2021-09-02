@@ -7,18 +7,29 @@ export interface Currency {
   mid: number;
 }
 
+export enum Status {
+  IDLE = "idle",
+  LOADING = "loading",
+  FAILED = "failed",
+  ERROR = "error",
+}
+
 export interface CurrenciesState {
   currencies: Currency[];
   firstCurrency?: Currency;
   secondCurrency?: Currency;
-  status: "idle" | "loading" | "failed" | "error";
+  baseCurrency?: Currency;
+  currencyTableAmount: number;
+  status: Status;
 }
 
 const initialState: CurrenciesState = {
   currencies: [],
   firstCurrency: undefined,
   secondCurrency: undefined,
-  status: "idle",
+  baseCurrency: undefined,
+  currencyTableAmount: 0,
+  status: Status.IDLE,
 };
 
 export const fetchCurrenciesData = createAsyncThunk("currencies/fetchCurrencies", async () => {
@@ -36,24 +47,32 @@ export const currenciesSlice = createSlice({
     setSecondCurrency: (state, action: PayloadAction<Currency | undefined>) => {
       state.secondCurrency = action.payload;
     },
+    setBaseCurrency: (state, action: PayloadAction<Currency | undefined>) => {
+      state.baseCurrency = action.payload;
+    },
+    setCurrencyTableAmount: (state, action: PayloadAction<number>) => {
+      state.currencyTableAmount = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
       .addCase(fetchCurrenciesData.pending, state => {
-        state.status = "loading";
+        state.status = Status.LOADING;
       })
       .addCase(fetchCurrenciesData.fulfilled, (state, action) => {
-        state.status = "idle";
+        state.status = Status.IDLE;
         state.currencies = action.payload?.[0]?.rates;
         state.firstCurrency = action.payload?.[0]?.rates?.[0];
         state.secondCurrency = action.payload?.[0]?.rates?.[1];
+        state.baseCurrency = action.payload?.[0]?.rates?.[0];
       })
       .addCase(fetchCurrenciesData.rejected, state => {
-        state.status = "error";
+        state.status = Status.ERROR;
       });
   },
 });
 
-export const { setFirstCurrency, setSecondCurrency } = currenciesSlice.actions;
+export const { setFirstCurrency, setSecondCurrency, setBaseCurrency, setCurrencyTableAmount } =
+  currenciesSlice.actions;
 
 export default currenciesSlice.reducer;

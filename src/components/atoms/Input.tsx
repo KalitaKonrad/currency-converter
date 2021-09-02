@@ -22,12 +22,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface InputProps extends OutlinedInputProps {
-  loading: boolean;
   currencyValue: string;
   code: string;
 }
 
-const Input: React.FC<InputProps> = ({ loading, currencyValue, code, onChange, ...restProps }) => {
+const Input: React.FC<InputProps> = ({ currencyValue, code, onChange, ...restProps }) => {
   const classes = useStyles();
   const formattedCode = code.substring(0, 2);
 

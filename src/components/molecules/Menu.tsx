@@ -26,7 +26,6 @@ interface ExchangeCardMenuProps {
   open: boolean;
   onClose: () => void;
   onMenuItemClick: (currency: Currency) => void;
-  loading: boolean;
 }
 
 const ITEM_HEIGHT = 70;
@@ -36,7 +35,6 @@ const ExchangeCardMenu: React.FC<ExchangeCardMenuProps> = ({
   open,
   onClose,
   onMenuItemClick,
-  loading,
   ...restProps
 }) => {
   const classes = useStyles();
@@ -66,13 +64,9 @@ const ExchangeCardMenu: React.FC<ExchangeCardMenuProps> = ({
             key={formattedCode}
             onClick={() => onMenuItemClick(currency)}>
             <Flag code={formattedCode} />
-            {loading ? (
-              <CircularProgress size={25} />
-            ) : (
-              <Typography variant="body1" className={classes.currencyName}>
-                {formattedCurrency}
-              </Typography>
-            )}
+            <Typography variant="body1" className={classes.currencyName}>
+              {formattedCurrency}
+            </Typography>
           </MenuItem>
         );
       })}

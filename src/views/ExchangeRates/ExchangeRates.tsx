@@ -1,9 +1,9 @@
 import React from "react";
-import CurrencyConvertCard from "../../components/organisms/CurrencyConvertCard";
 import { Layout } from "../../components/Layout";
+import { CurrencyTable } from "../../components/molecules/CurrencyTable";
 
 export const ExchangeRates = () => (
   <Layout>
-    <CurrencyConvertCard />
+    <CurrencyTable />
   </Layout>
 );
