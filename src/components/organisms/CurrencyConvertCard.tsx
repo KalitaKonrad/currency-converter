@@ -6,13 +6,15 @@ import ListItem from "@material-ui/core/ListItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import Button from "@material-ui/core/Button";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
-import { capitalize } from "../utils/utils";
 import Input from "../atoms/Input";
 import ExchangeCardMenu from "../molecules/Menu";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { fetchCurrenciesData } from "../../features/currencies/currenciesSlice";
+import {
+  fetchCurrenciesData,
+  setFirstCurrency,
+  setSecondCurrency,
+} from "../../features/currencies/currenciesSlice";
 import { Box, Typography } from "@material-ui/core";
-import { Layout } from "../Layout";
 
 const useStyles = makeStyles(() => ({
   label: {
@@ -32,17 +34,14 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ExchangeCard = () => {
+const CurrencyConvertCard = () => {
   const classes = useStyles();
-  const currencies = useAppSelector(state => state.currencies.currencies);
-  const status = useAppSelector(state => state.currencies.status);
+  const { firstCurrency, status, secondCurrency } = useAppSelector(state => state.currencies);
 
   const dispatch = useAppDispatch();
 
   const [sendCurrency, setSendCurrency] = useState("");
   const [receiveCurrency, setReceiveCurrency] = useState("");
-  const [sendIndex, setSendIndex] = useState(0);
-  const [receiveIndex, setReceiveIndex] = useState(1);
   const [anchorElement, setAnchorElement] = useState<Element | null>(null);
   const [secondAnchorElement, setSecondAnchorElement] = useState<Element | null>(null);
 
@@ -58,8 +57,6 @@ const ExchangeCard = () => {
 
   const handleClose = () => {
     setAnchorElement(null);
-    setSendCurrency("");
-    setReceiveCurrency("");
   };
 
   const secondHandleClick = (event: React.SyntheticEvent) => {
@@ -68,44 +65,44 @@ const ExchangeCard = () => {
 
   const secondHandleClose = () => {
     setSecondAnchorElement(null);
-    setSendCurrency("");
-    setReceiveCurrency("");
   };
 
   const calculateSendCurrency = (value: string) => {
     setReceiveCurrency(value);
 
-    const finalValue = (
-      (currencies[receiveIndex].mid / currencies[sendIndex].mid) *
-      parseInt(value, 10)
-    ).toFixed(2);
+    if (firstCurrency && secondCurrency) {
+      const finalValue = ((firstCurrency.mid / secondCurrency.mid) * parseInt(value, 10)).toFixed(
+        2
+      );
 
-    setSendCurrency(finalValue);
+      setSendCurrency(finalValue);
+    }
   };
 
   const calculateReceiveCurrency = (value: string) => {
     setSendCurrency(value);
 
-    const finalValue = (
-      (currencies[sendIndex].mid / currencies[receiveIndex].mid) *
-      parseInt(value, 10)
-    ).toFixed(2);
+    if (firstCurrency && secondCurrency) {
+      const finalValue = ((firstCurrency.mid / secondCurrency.mid) * parseInt(value, 10)).toFixed(
+        2
+      );
 
-    setReceiveCurrency(finalValue);
+      setReceiveCurrency(finalValue);
+    }
   };
 
-  const getCurrencyName = (index: number) =>
-    currencies?.[index]?.currency ? capitalize(currencies?.[index]?.currency?.trim()) : "";
-
-  const getCurrencyCode = (index: number) => currencies[index].code;
+  useEffect(() => {
+    calculateReceiveCurrency(sendCurrency);
+  }, [firstCurrency, secondCurrency]);
 
   const calculateCurrencyFactor = () => {
-    const exchangeRate = (currencies[sendIndex].mid / currencies[receiveIndex].mid).toFixed(2);
-    return `1 ${sendCurrencyCode} = ${exchangeRate} ${receiveCurrencyCode}`;
-  };
+    if (firstCurrency && secondCurrency) {
+      const exchangeRate = (firstCurrency.mid / secondCurrency.mid).toFixed(2);
 
-  const sendCurrencyCode = currencies?.length > 0 ? getCurrencyCode(sendIndex) : "";
-  const receiveCurrencyCode = currencies?.length > 0 ? getCurrencyCode(receiveIndex) : "";
+      return `1 ${firstCurrency.code} = ${exchangeRate} ${secondCurrency.code}`;
+    }
+    return undefined;
+  };
 
   return (
     <Box display="flex" maxWidth={500} justifyContent="center" alignItems="center">
@@ -139,18 +136,16 @@ const ExchangeCard = () => {
               loading={status === "loading"}
               onClose={handleClose}
               open={!!anchorElement}
-              onMenuItemClick={(index: number) => {
-                setSendIndex(index);
+              onMenuItemClick={currency => {
+                dispatch(setFirstCurrency(currency));
                 handleClose();
               }}
-              getCurrencyName={getCurrencyName}
             />
             <ListItem>
               <Input
                 currencyValue={sendCurrency}
-                currencyCode={sendCurrencyCode}
                 loading={status === "loading"}
-                index={sendIndex}
+                code={firstCurrency?.code ?? ""}
                 onChange={e => calculateReceiveCurrency(e.target.value)}
               />
             </ListItem>
@@ -173,22 +168,20 @@ const ExchangeCard = () => {
               loading={status === "loading"}
               onClose={secondHandleClose}
               open={!!secondAnchorElement}
-              onMenuItemClick={(index: number) => {
-                setReceiveIndex(index);
+              onMenuItemClick={currency => {
+                dispatch(setSecondCurrency(currency));
                 secondHandleClose();
               }}
-              getCurrencyName={getCurrencyName}
             />
             <ListItem>
               <Input
                 currencyValue={receiveCurrency}
-                currencyCode={receiveCurrencyCode}
                 loading={status === "loading"}
-                index={receiveIndex}
+                code={secondCurrency?.code ?? ""}
                 onChange={e => calculateSendCurrency(e.target.value)}
               />
             </ListItem>
-            {currencies && sendIndex && receiveIndex ? (
+            {sendCurrency && receiveCurrency ? (
               <ListItem classes={{ root: classes.exchangeRate }}>
                 <Box
                   mt={2}
@@ -208,4 +201,4 @@ const ExchangeCard = () => {
   );
 };
 
-export default ExchangeCard;
+export default CurrencyConvertCard;

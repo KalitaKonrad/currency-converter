@@ -1,9 +1,7 @@
 import React from "react";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import OutlinedInput, { OutlinedInputProps } from "@material-ui/core/OutlinedInput";
 import { makeStyles } from "@material-ui/core/styles";
-import { countryCodes } from "../utils/utils";
 import Flag from "./Flag";
 import Typography from "@material-ui/core/Typography";
 
@@ -26,19 +24,12 @@ const useStyles = makeStyles(theme => ({
 interface InputProps extends OutlinedInputProps {
   loading: boolean;
   currencyValue: string;
-  currencyCode: string;
-  index: number;
+  code: string;
 }
 
-const Input: React.FC<InputProps> = ({
-  loading,
-  currencyValue,
-  currencyCode,
-  index,
-  onChange,
-  ...restProps
-}) => {
+const Input: React.FC<InputProps> = ({ loading, currencyValue, code, onChange, ...restProps }) => {
   const classes = useStyles();
+  const formattedCode = code.substring(0, 2);
 
   return (
     <OutlinedInput
@@ -47,14 +38,14 @@ const Input: React.FC<InputProps> = ({
       placeholder="0"
       startAdornment={
         <InputAdornment className={classes.inputAdornmentStart} position="start">
-          <Flag code={countryCodes[index]} />
+          <Flag code={formattedCode} />
         </InputAdornment>
       }
       fullWidth
       value={currencyValue}
       endAdornment={
         <InputAdornment position="end">
-          <Typography variant="subtitle1">{currencyCode}</Typography>
+          <Typography variant="subtitle1">{code}</Typography>
         </InputAdornment>
       }
       onChange={onChange}

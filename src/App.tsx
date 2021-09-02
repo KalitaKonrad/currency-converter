@@ -1,8 +1,8 @@
 import React from "react";
-import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import dotenv from "dotenv";
-import ExchangeCard from "./components/organisms/ExchangeCard";
-import { Layout } from "./components/Layout";
+import { Converter } from "./views/Converter/Converter";
+import { ExchangeRates } from "./views/ExchangeRates/ExchangeRates";
 
 dotenv.config();
 
@@ -12,10 +12,10 @@ function App() {
       <div>
         <Switch>
           <Route exact path="/">
-            <Home />
+            <Converter />
           </Route>
           <Route exact path="/exchange-rates">
-            <Users />
+            <ExchangeRates />
           </Route>
         </Switch>
       </div>
@@ -24,23 +24,3 @@ function App() {
 }
 
 export default App;
-
-function Home() {
-  return (
-    <Layout>
-      <ExchangeCard />
-    </Layout>
-  );
-}
-
-function About() {
-  return <h2>About</h2>;
-}
-
-function Users() {
-  return (
-    <Layout>
-      <ExchangeCard />
-    </Layout>
-  );
-}

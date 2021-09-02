@@ -1,22 +1,23 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchCurrencies } from "./currenciesAPI";
 
 export interface Currency {
   currency: string;
   code: string;
   mid: number;
-  date: string;
 }
 
 export interface CurrenciesState {
   currencies: Currency[];
-  date: Date;
+  firstCurrency?: Currency;
+  secondCurrency?: Currency;
   status: "idle" | "loading" | "failed" | "error";
 }
 
 const initialState: CurrenciesState = {
   currencies: [],
-  date: new Date(),
+  firstCurrency: undefined,
+  secondCurrency: undefined,
   status: "idle",
 };
 
@@ -28,7 +29,14 @@ export const fetchCurrenciesData = createAsyncThunk("currencies/fetchCurrencies"
 export const currenciesSlice = createSlice({
   name: "currencies",
   initialState,
-  reducers: {},
+  reducers: {
+    setFirstCurrency: (state, action: PayloadAction<Currency | undefined>) => {
+      state.firstCurrency = action.payload;
+    },
+    setSecondCurrency: (state, action: PayloadAction<Currency | undefined>) => {
+      state.secondCurrency = action.payload;
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(fetchCurrenciesData.pending, state => {
@@ -36,15 +44,16 @@ export const currenciesSlice = createSlice({
       })
       .addCase(fetchCurrenciesData.fulfilled, (state, action) => {
         state.status = "idle";
-        const rates = action.payload?.[0]?.rates;
-        const date = action.payload?.[0].effectiveDate;
-        state.currencies = rates;
-        state.date = date;
+        state.currencies = action.payload?.[0]?.rates;
+        state.firstCurrency = action.payload?.[0]?.rates?.[0];
+        state.secondCurrency = action.payload?.[0]?.rates?.[1];
       })
       .addCase(fetchCurrenciesData.rejected, state => {
         state.status = "error";
       });
   },
 });
+
+export const { setFirstCurrency, setSecondCurrency } = currenciesSlice.actions;
 
 export default currenciesSlice.reducer;

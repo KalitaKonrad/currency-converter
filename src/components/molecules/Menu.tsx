@@ -1,11 +1,13 @@
 import MenuItem from "@material-ui/core/MenuItem";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Menu from "@material-ui/core/Menu";
-import React from "react";
+import React, { useCallback } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Flag from "../atoms/Flag";
-import { countryCodes } from "../utils/utils";
 import Typography from "@material-ui/core/Typography";
+import { useAppSelector } from "../../app/hooks";
+import { Currency } from "../../features/currencies/currenciesSlice";
+import { capitalize } from "../utils/utils";
 
 const useStyles = makeStyles(() => ({
   currencyName: {
@@ -23,9 +25,8 @@ interface ExchangeCardMenuProps {
   anchorElement: Element | null;
   open: boolean;
   onClose: () => void;
-  onMenuItemClick: (value: number) => void;
+  onMenuItemClick: (currency: Currency) => void;
   loading: boolean;
-  getCurrencyName: (value: number) => string;
 }
 
 const ITEM_HEIGHT = 70;
@@ -36,10 +37,10 @@ const ExchangeCardMenu: React.FC<ExchangeCardMenuProps> = ({
   onClose,
   onMenuItemClick,
   loading,
-  getCurrencyName,
   ...restProps
 }) => {
   const classes = useStyles();
+  const currencies = useAppSelector(state => state.currencies.currencies);
 
   return (
     <Menu
@@ -53,23 +54,28 @@ const ExchangeCardMenu: React.FC<ExchangeCardMenuProps> = ({
           maxHeight: ITEM_HEIGHT * 7,
         },
       }}>
-      {countryCodes.map((code, index) => (
-        <MenuItem
-          classes={{
-            root: classes.menuItem,
-          }}
-          key={code}
-          onClick={() => onMenuItemClick(index)}>
-          <Flag code={code} />
-          {loading ? (
-            <CircularProgress size={25} />
-          ) : (
-            <Typography variant="body1" className={classes.currencyName}>
-              {getCurrencyName(index)}
-            </Typography>
-          )}
-        </MenuItem>
-      ))}
+      {currencies.map(currency => {
+        const formattedCode = currency.code.substring(0, 2);
+        const formattedCurrency = capitalize(currency.currency);
+
+        return (
+          <MenuItem
+            classes={{
+              root: classes.menuItem,
+            }}
+            key={formattedCode}
+            onClick={() => onMenuItemClick(currency)}>
+            <Flag code={formattedCode} />
+            {loading ? (
+              <CircularProgress size={25} />
+            ) : (
+              <Typography variant="body1" className={classes.currencyName}>
+                {formattedCurrency}
+              </Typography>
+            )}
+          </MenuItem>
+        );
+      })}
     </Menu>
   );
 };
