@@ -53,6 +53,9 @@ export const currenciesSlice = createSlice({
     setCurrencyTableAmount: (state, action: PayloadAction<number>) => {
       state.currencyTableAmount = action.payload;
     },
+    setCurrencies: (state, action: PayloadAction<Currency[]>) => {
+      state.currencies = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -62,6 +65,7 @@ export const currenciesSlice = createSlice({
       .addCase(fetchCurrenciesData.fulfilled, (state, action) => {
         state.status = Status.IDLE;
         state.currencies = action.payload?.[0]?.rates;
+        localStorage.setItem("currencies", JSON.stringify(action.payload?.[0]?.rates));
         state.firstCurrency = action.payload?.[0]?.rates?.[0];
         state.secondCurrency = action.payload?.[0]?.rates?.[1];
         state.baseCurrency = action.payload?.[0]?.rates?.[0];
@@ -72,7 +76,12 @@ export const currenciesSlice = createSlice({
   },
 });
 
-export const { setFirstCurrency, setSecondCurrency, setBaseCurrency, setCurrencyTableAmount } =
-  currenciesSlice.actions;
+export const {
+  setFirstCurrency,
+  setSecondCurrency,
+  setBaseCurrency,
+  setCurrencyTableAmount,
+  setCurrencies,
+} = currenciesSlice.actions;
 
 export default currenciesSlice.reducer;

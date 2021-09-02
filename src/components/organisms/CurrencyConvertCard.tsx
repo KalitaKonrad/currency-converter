@@ -11,6 +11,7 @@ import ExchangeCardMenu from "../molecules/Menu";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   fetchCurrenciesData,
+  setCurrencies,
   setFirstCurrency,
   setSecondCurrency,
   Status,
@@ -49,7 +50,12 @@ const CurrencyConvertCard = () => {
   const [secondAnchorElement, setSecondAnchorElement] = useState<Element | null>(null);
 
   useEffect(() => {
-    if (currencies?.length === 0 || status === Status.ERROR) {
+    const currenciesFromLocalStorage = localStorage.getItem("currencies");
+
+    if (currencies?.length === 0 && currenciesFromLocalStorage) {
+      dispatch(setCurrencies(JSON.parse(currenciesFromLocalStorage)));
+      dispatch(fetchCurrenciesData());
+    } else if (currencies?.length === 0) {
       dispatch(fetchCurrenciesData());
     }
   }, []);
